@@ -7,11 +7,4 @@ package com.lvbby.flowable.core;
  */
 public interface IFlowActionExtension {
 
-    /***
-     * alias
-     * @return
-     */
-    default String alias() {
-        return null;
-    }
 }

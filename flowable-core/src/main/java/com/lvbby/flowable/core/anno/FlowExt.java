@@ -1,8 +1,5 @@
 package com.lvbby.flowable.core.anno;
 
-import com.lvbby.flowable.core.IFlowAction;
-import com.lvbby.flowable.core.VoidAction;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -24,9 +21,4 @@ public @interface FlowExt {
      */
     String value() ;
 
-    /***
-     * 指定名称为Action的className
-     * @return
-     */
-    Class<? extends IFlowAction> actionClass() default VoidAction.class;
 }

@@ -1,7 +1,11 @@
-package com.lvbby.flowable.spring.test.action;
+package com.lvbby.flowable.test.spring;
 
-import com.lvbby.flowable.core.anno.FlowAction;
+import com.lvbby.flowable.core.anno.WithExtensionProperty;
 import com.lvbby.flowable.core.utils.FlowableHelper;
+import com.lvbby.flowable.test.AbstractOrderAction;
+import com.lvbby.flowable.test.CreateOrderActionExtension;
+import com.lvbby.flowable.test.OrderContext;
+import com.lvbby.flowable.test.OrderDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -12,8 +16,9 @@ import java.util.Optional;
  * @version $Id: InitAction.java, v 0.1 2020年03月06日 21:37 dushang.lp Exp $
  */
 @Component
-@FlowAction(value = {CreateOrderActionExtension.class})
 public class CreateOrderAction implements AbstractOrderAction {
+
+    public static final String PROP = "flow.property";
     @Override
     public void invoke(OrderContext context) {
 
@@ -24,6 +29,13 @@ public class CreateOrderAction implements AbstractOrderAction {
         orderDTO.setStatus("init");
         context.putValue("order", orderDTO);
         System.out.println("init " + title);
+
+        System.out.println("========props=====:" + FlowableHelper.getProp(PROP));
+    }
+
+    @WithExtensionProperty("sdfssdfasdf")
+    public String extValue() {
+        return (String) FlowableHelper.getProp("exs");
     }
 
 }

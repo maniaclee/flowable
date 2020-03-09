@@ -1,6 +1,9 @@
 
 package com.lvbby.flowable.core;
 
+import com.lvbby.flowable.core.anno.FlowAction;
+import com.lvbby.flowable.core.utils.FlowableHelper;
+
 /**
  *
  * @author dushang.lp
@@ -10,11 +13,8 @@ public interface IFlowAction<IContext extends FlowContext> {
     void invoke(IContext context);
 
     default String actionName() {
-        return null;
-    }
-
-    default Class<? extends IFlowActionExtension>[] extensions() {
-        return null;
+        FlowAction annotation = FlowableHelper.getAnnotation(getClass(), FlowAction.class);
+        return annotation == null ? null : annotation.id();
     }
 
 }

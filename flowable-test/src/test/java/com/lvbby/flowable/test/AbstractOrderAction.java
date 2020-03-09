@@ -1,8 +1,4 @@
-/**
- * Alipay.com Inc.
- * Copyright (c) 2004-2020 All Rights Reserved.
- */
-package com.lvbby.flowable.spring.test.action;
+package com.lvbby.flowable.test;
 
 import com.lvbby.flowable.core.IFlowAction;
 

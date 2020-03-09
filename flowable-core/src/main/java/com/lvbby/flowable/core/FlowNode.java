@@ -4,6 +4,7 @@ package com.lvbby.flowable.core;
 import com.google.common.collect.Lists;
 import com.lvbby.flowable.core.utils.FlowableHelper;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -15,6 +16,8 @@ import java.util.function.Predicate;
  */
 public class FlowNode {
     private String                 actionId;
+    /** 节点名称，用作命名 */
+    private String                 name;
     private Predicate<FlowContext> condition;
     private List<FlowNode>         children;
     /***
@@ -87,6 +90,14 @@ public class FlowNode {
         return this;
     }
 
+    /***
+     * 如果有alias，则直接使用alias作为id
+     * @return
+     */
+    public String id() {
+        return StringUtils.isBlank(alias) ? actionId : alias;
+    }
+
     /**
      * Getter method for property   actionId.
      *
@@ -157,5 +168,23 @@ public class FlowNode {
      */
     public void setAlias(String alias) {
         this.alias = alias;
+    }
+
+    /**
+     * Getter method for property   name.
+     *
+     * @return property value of name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Setter method for property   name .
+     *
+     * @param name  value to be assigned to property name
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 }

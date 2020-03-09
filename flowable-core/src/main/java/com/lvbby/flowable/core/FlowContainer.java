@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Map;
 
 /**
- *
+ * 容器，装在全局的流程和模块
  * @author dushang.lp
  * @version $Id: FlowConfigsHolder.java, v 0.1 2020年03月06日 下午6:03 dushang.lp Exp $
  */

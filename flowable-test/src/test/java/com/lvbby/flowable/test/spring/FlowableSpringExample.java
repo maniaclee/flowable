@@ -1,5 +1,5 @@
 
-package com.lvbby.flowable.spring.test;
+package com.lvbby.flowable.test.spring;
 
 import com.alibaba.fastjson.JSON;
 import com.lvbby.flowable.core.Flow;
@@ -8,12 +8,10 @@ import com.lvbby.flowable.core.FlowScript;
 import com.lvbby.flowable.core.IFlowAction;
 import com.lvbby.flowable.core.utils.FlowableHelper;
 import com.lvbby.flowable.spring.anno.EnableFlow;
-import com.lvbby.flowable.spring.test.FlowableSpringExample.ConfigurationTest;
-import com.lvbby.flowable.spring.test.action.CreateOrderAction;
-import com.lvbby.flowable.spring.test.action.CreateOrderActionExtension;
-import com.lvbby.flowable.spring.test.action.OrderContext;
-import com.lvbby.flowable.spring.test.action.OrderDTO;
-import com.lvbby.flowable.spring.test.action.OrderProcessAction;
+import com.lvbby.flowable.test.CreateOrderActionExtension;
+import com.lvbby.flowable.test.spring.FlowableSpringExample.ConfigurationTest;
+import com.lvbby.flowable.test.OrderContext;
+import com.lvbby.flowable.test.OrderDTO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,13 +88,11 @@ public class FlowableSpringExample {
     @Test
     public void pipelineWithScene() {
         /** 1. 创建流程 */
-        FlowNode script = FlowNode.ofArray(createOrderAction, orderProcessAction);
+        FlowNode pipeline = FlowNode.ofArray(createOrderAction, orderProcessAction);
 
         /** 2. 创建场景，实现业务扩展逻辑，并注册到框架里*/
-        Flow.addFlowConfig(
-                FlowScript.of("pipelineSingle", script)
-                        .add(CreateOrderActionExtension.class, () -> "pipelineATitle")
-        );
+        FlowScript.of("pipelineSingle", pipeline)
+                .addExtension((CreateOrderActionExtension) () -> "pipelineATitle").register();
 
         /** 3. 按照场景进行调用 */
         Flow.exec(new OrderContext("pipelineSingle"));
@@ -104,17 +100,15 @@ public class FlowableSpringExample {
 
     @Test
     public void pipelineMultiScene() {
-        FlowNode script = FlowNode.ofArray(createOrderAction, orderProcessAction);
+        FlowNode pipeline = FlowNode.ofArray(createOrderAction, orderProcessAction);
 
         /** 创建两个场景，具有不同的业务逻辑实现*/
-        Flow.addFlowConfig(
-                FlowScript.of("pipelineA", script)
-                        .add(CreateOrderActionExtension.class, () -> "pipelineATitle")
-        );
-        Flow.addFlowConfig(
-                FlowScript.of("pipelineB", script)
-                        .add(CreateOrderActionExtension.class, () -> "pipelineBTitle")
-        );
+        FlowScript.of("pipelineA", pipeline)
+                .addExtension((CreateOrderActionExtension) () -> "pipelineATitle").register();
+
+        FlowScript.of("pipelineB", pipeline)
+                .addExtension((CreateOrderActionExtension) () -> "pipelineBTitle")
+                .register();
 
         /** 实际调用两个场景 */
         Flow.exec(new OrderContext("pipelineA"));
@@ -125,23 +119,19 @@ public class FlowableSpringExample {
     public void innerBeanTest() {
 
         /** 1. 定义流程编排*/
-        FlowNode script =
+        FlowNode pipeline =
                 FlowNode.node(createOrderActionInner)
-                        .next(FlowNode.node(orderProcessActionInner).when(ctx -> ctx.hasValue("order"))
-                        );
+                        .next(FlowNode.node(orderProcessActionInner).when(ctx -> ctx.hasValue("order")));
 
         /** 2. 定义场景：流程+扩展点 */
-        Flow.instance
-                .addFlowConfig("example", script);
-        Flow.instance
-                .addFlowConfig("error", FlowNode.node(orderProcessActionInner), null);
-
+        FlowScript.of("example", pipeline).register();
+        FlowScript.of("error", FlowNode.node(orderProcessActionInner));
         /** 启动流程 */
         Flow.exec(new OrderContext("example"));
         System.out.println("=================");
         try {
             Flow.exec(new OrderContext("error"));
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("expected error");
         }
     }
@@ -150,20 +140,14 @@ public class FlowableSpringExample {
     public void normalBeanTest() {
 
         /** 1. 定义流程编排*/
-        FlowNode script =
-                FlowNode.node(createOrderAction)
-                        .next(FlowNode.node(orderProcessAction).when(ctx -> ctx.hasValue("order"))
-                        );
+        FlowNode pipeline = FlowNode.node(createOrderAction)
+                .next(FlowNode.node(orderProcessAction).when(ctx -> ctx.hasValue("order")));
 
         /** 2. 定义场景：流程+扩展点 */
-
-        Flow.instance
-                .addFlowConfig(FlowScript.of("exampleBean", script).add(new CreateOrderActionExtension() {
-                    @Override
-                    public String getTitle() {
-                        return "springOrder";
-                    }
-                }));
+        FlowScript.of("exampleBean", pipeline)
+                .addExtension((CreateOrderActionExtension) () -> "springOrder")
+                .addProperty(CreateOrderAction.PROP, "PROPERTY--TEST")
+                .register();
 
         /** 启动流程 */
         Flow.exec(new OrderContext("exampleBean"));

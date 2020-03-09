@@ -17,6 +17,7 @@ public class FlowContext {
     private String code;
 
     protected Map<String, Object> data;
+    public static ThreadLocal<FlowContext>  contextThreadLocal = new ThreadLocal<>();
 
     public FlowContext(String code) {
         this.code = code;
@@ -24,6 +25,12 @@ public class FlowContext {
 
     public FlowContext() {
     }
+
+    public FlowContext  script(FlowScript script){
+        setConfig(script);
+        return this;
+    }
+
 
     public <T> T getValue(String key) {
         return (T) ensureData().get(key);
@@ -33,8 +40,20 @@ public class FlowContext {
         return getValue(key);
     }
 
-    public boolean hasValue(String key){
-        return getValue(key)!=null;
+    public FlowNode currentNode() {
+        return get(FlowFrameWorkKeys.currentNode);
+    }
+
+    public boolean hasValue(String key) {
+        return getValue(key) != null;
+    }
+
+    public <T> T get(FlowKey<T> key) {
+        return getValue(key.getKey());
+    }
+
+    public <T> void put(FlowKey<T> key, T object) {
+        putValue(key.getKey(), object);
     }
 
     private Map<String, Object> ensureData() {
@@ -51,6 +70,16 @@ public class FlowContext {
         return this;
     }
 
+    public static FlowContext currentContext() {
+        return contextThreadLocal.get();
+    }
+
+    public static void cleanContext() {
+        contextThreadLocal.remove();
+    }
+    public static void buildCurrentContext(FlowContext context) {
+        contextThreadLocal.set(context);
+    }
     /**
      * Getter method for property   config.
      *

@@ -1,5 +1,5 @@
 
-package com.lvbby.flowable.spring.test.action;
+package com.lvbby.flowable.test;
 
 import com.lvbby.flowable.core.IFlowActionExtension;
 import com.lvbby.flowable.core.anno.FlowExt;

@@ -5,6 +5,6 @@
        default-autowire="byName"
 >
 
-    <bean id="createOrderAction" class="com.lvbby.flowable.spring.test.action.CreateOrderAction"/>
-    <bean id="orderProcessAction" class="com.lvbby.flowable.spring.test.action.OrderProcessAction"/>
+    <bean id="createOrderAction" class="com.lvbby.flowable.test.spring.CreateOrderAction"/>
+    <bean id="orderProcessAction" class="com.lvbby.flowable.test.spring.OrderProcessAction"/>
 </beans>

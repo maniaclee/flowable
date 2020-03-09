@@ -2,6 +2,7 @@
 package com.lvbby.flowable.spring;
 
 import com.lvbby.flowable.core.FlowContainer;
+import com.lvbby.flowable.core.FlowScript;
 import com.lvbby.flowable.core.IFlowAction;
 import com.lvbby.flowable.core.anno.FlowAction;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -25,21 +26,27 @@ import java.util.Optional;
  * @version $Id: FlowSpring.java, v 0.1 2020年03月07日 00:48 dushang.lp Exp $
  */
 
-public class FlowSpring implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> ,BeanPostProcessor {
+public class FlowSpring implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent>, BeanPostProcessor {
 
     private ApplicationContext applicationContext;
-
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         ApplicationContext applicationContext = event.getApplicationContext();
+        /** 1.注册action */
         Map<String, IFlowAction> actions = applicationContext.getBeansOfType(IFlowAction.class);
         actions.forEach((beanName, action) -> {
             /** 注册所有的action */
             FlowContainer.registerFlowAction(action.actionName(), action);
-            System.out.println("register flowAction:"+action.actionName());
+            System.out.println("register flowAction:" + action.actionName());
         });
+        /** 2.注册script */
+        Map<String, FlowScript> bizList = applicationContext.getBeansOfType(FlowScript.class);
+        if (bizList != null) {
+            bizList.values().forEach(FlowScript::register);
+        }
     }
+
     /***
      * 优先级：
      * 1. IFlowAction#actionName
@@ -57,7 +64,6 @@ public class FlowSpring implements ApplicationContextAware, ApplicationListener<
          */
         return Optional.ofNullable(annotationOnBean).map(FlowAction::id).filter(StringUtils::isNotBlank).orElse(actionBeanName);
     }
-
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
@@ -91,11 +97,9 @@ public class FlowSpring implements ApplicationContextAware, ApplicationListener<
         return bean;
     }
 
-
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-
 
 }

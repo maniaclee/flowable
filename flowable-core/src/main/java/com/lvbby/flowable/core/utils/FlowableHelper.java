@@ -1,8 +1,6 @@
 
 package com.lvbby.flowable.core.utils;
 
-import com.lvbby.flowable.core.FlowScript;
-import com.lvbby.flowable.core.FlowContainer;
 import com.lvbby.flowable.core.FlowContext;
 import com.lvbby.flowable.core.IFlowAction;
 import com.lvbby.flowable.core.IFlowActionExtension;
@@ -12,6 +10,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.annotation.Annotation;
+import java.util.Optional;
 
 /**
  *
@@ -20,12 +19,28 @@ import java.lang.annotation.Annotation;
  */
 public class FlowableHelper {
 
+    /***
+     * 获取扩展的方式
+     * @param context
+     * @param clz
+     * @param <Ext>
+     * @return
+     */
     public static <Ext extends IFlowActionExtension> Ext getExtension(FlowContext context, Class<Ext> clz) {
-        FlowScript flowConfig = FlowContainer.getFlowConfig(context.getCode());
-        if(flowConfig==null){
-            return null;
-        }
-        return flowConfig.getExtension(clz);
+        return context.getConfig().getExtension(context, clz);
+    }
+
+    public static boolean  isClassOf(Class  toCheck, Class target){
+        return ClassUtils.isAssignable(toCheck, target);
+    }
+    /***
+     * 获取属性的方法
+     * @param key
+     * @return
+     */
+    public static Object getProp(String key) {
+        FlowContext flowContext = FlowContext.currentContext();
+        return flowContext.getConfig().getExtProperty(flowContext, key);
     }
 
     public static String getFlowActionName(IFlowAction action) {
@@ -39,14 +54,9 @@ public class FlowableHelper {
         return actionName;
     }
 
-    public static String getFlowExtName(Class clz) {
-        FlowExt annotation = getAnnotation(clz, FlowExt.class);
-        return annotation == null ? null : annotation.value();
-    }
-
-    public static String getFlowExtName(IFlowActionExtension extension) {
-        FlowExt annotation = getAnnotation(extension.getClass(), FlowExt.class);
-        return annotation == null ? null : annotation.value();
+    public static String getFlowExtName(Class extensionClz) {
+        FlowExt annotation = getAnnotation(extensionClz, FlowExt.class);
+        return Optional.ofNullable(annotation).map(FlowExt::value).orElse(null);
     }
 
     public static void isTrue(boolean expr, String msg) {

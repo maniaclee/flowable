@@ -1,5 +1,5 @@
 
-package com.lvbby.flowable.spring.test.action;
+package com.lvbby.flowable.test;
 
 /**
  *

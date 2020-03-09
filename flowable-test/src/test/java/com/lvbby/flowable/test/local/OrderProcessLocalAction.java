@@ -1,17 +1,20 @@
-package com.lvbby.flowable.spring.test.action;
+package com.lvbby.flowable.test.local;
 
 import com.alibaba.fastjson.JSON;
-import org.springframework.stereotype.Component;
+import com.lvbby.flowable.core.FlowContext;
+import com.lvbby.flowable.core.IFlowAction;
+import com.lvbby.flowable.core.anno.FlowAction;
+import com.lvbby.flowable.test.OrderDTO;
 
 /**
  *
  * @author dushang.lp
  * @version $Id: InitAction.java, v 0.1 2020年03月06日 21:37 dushang.lp Exp $
  */
-@Component
-public class OrderProcessAction implements AbstractOrderAction {
+@FlowAction(id = "OrderProcessLocalAction")
+public class OrderProcessLocalAction implements IFlowAction {
     @Override
-    public void invoke(OrderContext context) {
+    public void invoke(FlowContext context) {
         OrderDTO order = context.getValue("order");
         if(order==null || !order.getStatus().equals("init")){
             throw new RuntimeException("order is null or status invalid");
